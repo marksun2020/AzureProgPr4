@@ -6,23 +6,34 @@ import socket
 import sys
 import logging
 from datetime import datetime
+from opencensus.ext.azure import metrics_exporter
+from opencensus.ext.azure.trace_exporter import AzureExporter
+from opencensus.trace.tracer import Tracer
+from opencensus.trace.samplers import ProbabilitySampler
+from opencensus.ext.flask.flask_middleware import FlaskMiddleware
+from opencensus.ext.azure.log_exporter import AzureLogHandler
+
 
 # App Insights
-# TODO: Import required libraries for App Insights
+# TOD O: Import required libraries for App Insights
 
 # Logging
-logger = # TODO: Setup logger
+logger = logging.getLogger(__name__)
+logger.addHandler(AzureLogHandler(
+    connection_string='InstrumentationKey=0e8e8678-f2cb-4679-98ec-bfabe1860c5a;IngestionEndpoint=https://westus2-2.in.applicationinsights.azure.com/')
 
 # Metrics
-exporter = # TODO: Setup exporter
+exporter = metrics_exporter.new_metrics_exporter(enable_standard_metrics=True,connection_string='InstrumentationKey=0e8e8678-f2cb-4679-98ec-bfabe1860c5a;IngestionEndpoint=https://westus2-2.in.applicationinsights.azure.com/')
 
 # Tracing
-tracer = # TODO: Setup tracer
+tracer = Tracer(exporter=AzureExporter(connection_string='InstrumentationKey=0e8e8678-f2cb-4679-98ec-bfabe1860c5a;IngestionEndpoint=https://westus2-2.in.applicationinsights.azure.com/'),sampler=ProbabilitySampler(1.0),)
 
 app = Flask(__name__)
 
 # Requests
-middleware = # TODO: Setup flask middleware
+middleware = FlaskMiddleware(app,exporter=AzureExporter(
+                        connection_string='InstrumentationKey=0e8e8678-f2cb-4679-98ec-bfabe1860c5a;IngestionEndpoint=https://westus2-2.in.applicationinsights.azure.com/'),
+                        sampler=ProbabilitySampler(1.0),)
 
 # Load configurations from environment or config file
 app.config.from_pyfile('config_file.cfg')
@@ -77,10 +88,12 @@ def index():
             vote1 = r.get(button1).decode('utf-8')
             properties = {'custom_dimensions': {'Cats Vote': vote1}}
             # TODO: use logger object to log cat vote
+            logger.info("Vote for cats: {}",vote1)
 
             vote2 = r.get(button2).decode('utf-8')
             properties = {'custom_dimensions': {'Dogs Vote': vote2}}
             # TODO: use logger object to log dog vote
+            logger.info("Vote for dogs: {}",vote2)
 
             return render_template("index.html", value1=int(vote1), value2=int(vote2), button1=button1, button2=button2, title=title)
 
