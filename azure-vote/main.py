@@ -27,24 +27,24 @@ config_integration.trace_integrations(['logging'])
 config_integration.trace_integrations(['requests'])
 logger = logging.getLogger(__name__)
 
-handler = AzureLogHandler(connection_string='InstrumentationKey=c41b42a1-b327-4ed4-8bd0-5152e67bd24e')
+handler = AzureLogHandler(connection_string='InstrumentationKey=d7a366b0-e9f1-4105-b396-2182758e73e7')
 handler.setFormatter(logging.Formatter('%(traceId)s %(spanId)s %(message)s'))
 logger.addHandler(handler)
-logger.addHandler(AzureEventHandler(connection_string='InstrumentationKey=c41b42a1-b327-4ed4-8bd0-5152e67bd24e'))
+logger.addHandler(AzureEventHandler(connection_string='InstrumentationKey=d7a366b0-e9f1-4105-b396-2182758e73e7'))
 logger.setLevel(logging.INFO)
 
 # Metrics
-exporter = metrics_exporter.new_metrics_exporter(enable_standard_metrics=True,connection_string='InstrumentationKey=c41b42a1-b327-4ed4-8bd0-5152e67bd24e;IngestionEndpoint=https://westus2-2.in.applicationinsights.azure.com/')
+exporter = metrics_exporter.new_metrics_exporter(enable_standard_metrics=True,connection_string='InstrumentationKey=d7a366b0-e9f1-4105-b396-2182758e73e7;IngestionEndpoint=https://eastus2-3.in.applicationinsights.azure.com/')
 view_manager.register_exporter(exporter)
 
 # Tracing
-tracer = Tracer(exporter=AzureExporter(connection_string='InstrumentationKey=c41b42a1-b327-4ed4-8bd0-5152e67bd24e;IngestionEndpoint=https://westus2-2.in.applicationinsights.azure.com/'),sampler=ProbabilitySampler(1.0),)
+tracer = Tracer(exporter=AzureExporter(connection_string='InstrumentationKey=d7a366b0-e9f1-4105-b396-2182758e73e7;IngestionEndpoint=https://eastus2-3.in.applicationinsights.azure.com/'),sampler=ProbabilitySampler(1.0),)
 
 app = Flask(__name__)
 
 # Requests
 middleware = FlaskMiddleware(app,exporter=AzureExporter(
-                        connection_string='InstrumentationKey=c41b42a1-b327-4ed4-8bd0-5152e67bd24e;IngestionEndpoint=https://westus2-2.in.applicationinsights.azure.com/'),
+                        connection_string='InstrumentationKey=d7a366b0-e9f1-4105-b396-2182758e73e7;IngestionEndpoint=https://eastus2-3.in.applicationinsights.azure.com/'),
                         sampler=ProbabilitySampler(1.0),)
 
 # Load configurations from environment or config file
